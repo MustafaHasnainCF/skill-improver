@@ -2,7 +2,7 @@
 description: >
   Start autonomous skill improvement loop. Analyzes failures, rewrites SKILL.md,
   evaluates, and ratchets improvements until convergence.
-argument-hint: "<skill-path> [--max-iterations 20] [--target-score 0.90] [--max-plateau 5] [--strategist-interval 3] [--weights 'assertion:0.5,trigger:0.2,quality:0.3']"
+argument-hint: "<skill-path> [--max-iterations 20] [--target-score 0.90] [--max-plateau 5] [--strategist-interval 3] [--weights 'assertion:0.5,trigger:0.2,quality:0.3'] [--objective 'qualitative description']"
 allowed-tools:
   - Bash
   - Read
@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Grep
   - Agent
+  - AskUserQuestion
 ---
 
 # Improve Skill
@@ -18,10 +19,54 @@ allowed-tools:
 Run the setup script to initialize the improvement loop:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-improvement.sh" $ARGUMENTS
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-improvement.sh" $ARGUMENTS 2>&1
+SETUP_EXIT=$?
 ```
 
-After setup completes successfully, read the state file to begin the first iteration:
+## Handle missing evals (exit code 2)
+
+If setup exits with code 2, the skill has no valid evals. Generate them first using the objective-translator agent.
+
+Check if `--objective` was provided in the arguments. Parse it from `$ARGUMENTS` — it appears as `--objective "some text"` or `--objective 'some text'`.
+
+### If `--objective` was provided (autonomous mode):
+
+Spawn the objective-translator agent (`${CLAUDE_PLUGIN_ROOT}/agents/objective-translator.md`) with:
+
+```
+Skill path: {the skill path from arguments}
+Plugin root: ${CLAUDE_PLUGIN_ROOT}
+Mode: autonomous
+Objective: {the objective text extracted from --objective flag}
+```
+
+The agent will generate evals.json directly without interviewing the user.
+
+### If no `--objective` was provided (interactive mode):
+
+Spawn the objective-translator agent (`${CLAUDE_PLUGIN_ROOT}/agents/objective-translator.md`) with:
+
+```
+Skill path: {the skill path from arguments}
+Plugin root: ${CLAUDE_PLUGIN_ROOT}
+Mode: interactive
+```
+
+The agent will interview the user about their goals, then generate evals.json.
+
+### After evals are generated:
+
+Re-run the setup script to continue with the improvement loop:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-improvement.sh" $ARGUMENTS 2>&1
+```
+
+If setup still fails after eval generation, report the error and stop.
+
+## Normal flow (setup succeeded)
+
+After setup completes successfully (exit code 0), read the state file to begin the first iteration:
 
 ```bash
 cat .claude/skill-improver.local.md

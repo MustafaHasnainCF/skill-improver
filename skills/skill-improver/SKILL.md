@@ -4,7 +4,8 @@ description: >
   Autonomously improve, optimize, and iterate on Claude Code skills using an autoresearch-inspired loop.
   Use when the user wants to "improve a skill", "optimize a skill", "make a skill better automatically",
   "autoresearch this skill", "run improvement loop on skill", "iterate on skill quality",
-  "auto-improve skill evals", or "overnight skill optimization".
+  "auto-improve skill evals", "overnight skill optimization", "generate evals for a skill",
+  "create test cases from objectives", or "I want this skill to be more concise/robust/better formatted".
 ---
 
 # Skill Improver
@@ -26,10 +27,17 @@ The loop continues until target score is reached, a plateau is detected, or max 
 
 Tell the user to run:
 ```
-/improve-skill <path-to-skill> [--max-iterations 20] [--target-score 0.90] [--max-plateau 5]
+/improve-skill <path-to-skill> [--max-iterations 20] [--target-score 0.90] [--max-plateau 5] [--objective "qualitative goal"]
 ```
 
 Or if the user describes wanting to improve a skill, invoke the `/improve-skill` command for them with the appropriate arguments.
+
+If the skill has no evals yet, the system will automatically interview the user about their goals and generate measurable evals. For autonomous runs, pass `--objective "your goal"` to skip the interview.
+
+To generate evals standalone (without starting the improvement loop):
+```
+/generate-evals <path-to-skill> [--objective "qualitative goal"]
+```
 
 ## Architecture
 
@@ -38,11 +46,12 @@ Or if the user describes wanting to improve a skill, invoke the `/improve-skill`
 - **Evaluator Agent**: Runs evals using skill-creator infrastructure, computes composite score
 - **Strategist Agent**: Meta-analyzes score trajectory every N iterations, recommends direction changes
 - **Ratchet Mechanism**: Git-based — only commits improvements, reverts regressions
+- **Objective Translator Agent**: Interviews user about qualitative goals, generates measurable evals.json
 - **Convergence Detection**: Target score, plateau detection, max iterations
 
 ## Requirements
 
 - The skill must have a `SKILL.md` file
-- The skill must have `evals/evals.json` (or `evals.json`) with assertions
+- The skill must have `evals/evals.json` (or `evals.json`) with assertions — or the objective translator will generate them
 - The skill-creator plugin must be installed
 - Git must be initialized in the skill's directory

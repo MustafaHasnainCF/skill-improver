@@ -22,7 +22,7 @@ USAGE:
   /improve-skill <SKILL_PATH> [OPTIONS]
 
 ARGUMENTS:
-  SKILL_PATH    Path to the skill directory (must contain SKILL.md and evals/)
+  SKILL_PATH    Path to the skill directory (must contain SKILL.md; evals/ generated if missing)
 
 OPTIONS:
   --max-iterations <n>          Maximum iterations before auto-stop (default: 20)
@@ -30,6 +30,7 @@ OPTIONS:
   --max-plateau <n>             Stop after N consecutive non-improvements (default: 5)
   --strategist-interval <n>     Run strategist every N iterations (default: 3)
   --weights <spec>              Score weights as key:value pairs (default: assertion:0.5,trigger:0.2,quality:0.3)
+  --objective <text>            Qualitative objective for auto-generating evals (skips interview)
   -h, --help                    Show this help message
 
 EXAMPLES:
@@ -92,6 +93,10 @@ while [[ $# -gt 0 ]]; do
       SCORE_WEIGHTS="$2"
       shift 2
       ;;
+    --objective)
+      # Consumed by improve-skill.md, not by this script — just skip it
+      shift 2
+      ;;
     *)
       if [[ -z "$SKILL_PATH" ]]; then
         SKILL_PATH="$1"
@@ -139,9 +144,10 @@ if [[ -f "$SKILL_PATH/evals/evals.json" ]]; then
 elif [[ -f "$SKILL_PATH/evals.json" ]]; then
   EVALS_PATH="$SKILL_PATH/evals.json"
 else
-  echo "Error: No evals found at $SKILL_PATH/evals/evals.json or $SKILL_PATH/evals.json" >&2
-  echo "  The skill must have evaluation definitions to improve against" >&2
-  exit 1
+  echo "NO_EVALS"
+  echo "No evals found at $SKILL_PATH/evals/evals.json or $SKILL_PATH/evals.json" >&2
+  echo "The objective-translator agent will generate evals from your goals." >&2
+  exit 2
 fi
 
 # Validate evals.json has assertions
@@ -160,9 +166,10 @@ except:
 " 2>/dev/null || echo "0")
 
 if [[ "$EVAL_COUNT" == "0" ]]; then
-  echo "Error: evals.json must be a non-empty array with assertions/expectations" >&2
-  echo "  File: $EVALS_PATH" >&2
-  exit 1
+  echo "NO_EVALS"
+  echo "No valid evals found at $EVALS_PATH" >&2
+  echo "The objective-translator agent will generate evals from your goals." >&2
+  exit 2
 fi
 
 # Auto-discover skill-creator path
