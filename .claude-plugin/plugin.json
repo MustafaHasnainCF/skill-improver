@@ -1,0 +1,5 @@
+{
+  "name": "skill-improver",
+  "description": "Autonomously improve skills via autoresearch-inspired experimentation loop",
+  "author": { "name": "Custom" }
+}
