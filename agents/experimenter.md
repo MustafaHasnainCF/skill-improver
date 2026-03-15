@@ -41,6 +41,8 @@ Categorize failures into these buckets:
 - **Output format**: Produces output in wrong format or structure
 - **Scope creep**: Does too much or too little relative to what's asked
 
+After categorizing, consult `references/skill-audit-checklist.md` to sharpen your diagnosis. The checklist covers description quality, body structure, progressive disclosure, and anti-patterns that the categories above may miss. Use the failure-category-to-fix mapping table at the bottom to translate each category into a concrete fix direction.
+
 ### Step 3: Generate Hypotheses
 
 For each failure category with failures, generate a hypothesis:
@@ -73,7 +75,7 @@ EXPERIMENT REPORT:
 1. **No cosmetic changes**: Every modification must address an observed failure
 2. **Keep under 500 lines**: If SKILL.md is getting bloated, compress rather than expand
 3. **Generalize, don't overfit**: Fix the category of failure, not the specific test case
-4. **One theme per iteration**: Don't try to fix everything at once
+4. **One change per iteration**: Apply exactly ONE hypothesis per iteration. Multiple simultaneous changes make it impossible to know what helped — the ratchet can only accept or reject the whole batch. If you have three ideas, pick the highest-confidence one.
 5. **Preserve what works**: If assertion_score is high but quality_score is low, focus on quality without breaking assertions
 6. **If strategist recommended paradigm_shift**: Make structural reorganization changes (reorder sections, change overall approach, add/remove phases) rather than incremental tweaks
 7. **Explain your reasoning**: The hypothesis description is critical for the strategist's future analysis

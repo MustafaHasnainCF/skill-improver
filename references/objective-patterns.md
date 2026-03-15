@@ -149,3 +149,18 @@ When multiple objectives apply to the same eval:
 - Keep assertions from different objectives distinguishable (a grader should know which objective each measures)
 - Don't overload a single eval with too many objectives — spread them across prompts
 - Prioritize: if objectives conflict (conciseness vs thoroughness), the user's primary objective wins
+
+## Test Category Balance
+
+When generating evals, distribute prompts across these categories:
+
+| Category | Count | Purpose |
+|---|---|---|
+| Happy Path | 3-5 | Typical tasks the skill should handle well |
+| Edge Cases | 2-3 | Ambiguous input, missing context, boundary conditions |
+| Error Scenarios | 1-2 | Requests outside skill domain, broken input |
+| Anti-Pattern Checks | 1-2 | Known bad behaviors the skill should avoid |
+
+A good eval suite of 7-10 evals has representation from all four categories.
+Don't cluster all evals around one type — a skill that aces happy paths but
+fails every edge case is not a good skill.

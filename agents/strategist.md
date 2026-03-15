@@ -41,6 +41,15 @@ You are the Strategist agent in the skill-improver autonomous loop. You provide 
 - Close to the ceiling for current approach
 - May need fundamental restructuring
 
+**Rewrite Signals**: Fundamental restructuring needed, not more patches
+- Assertion pass rate is below 40% after 5+ iterations
+- Same failure categories keep recurring despite targeted fixes
+- Multiple hypotheses have been tried and reverted for the same issue
+- SKILL.md has accumulated contradictory patches (instructions that conflict)
+- Score trajectory shows no meaningful improvement over last 5 iterations
+
+If 3+ of these signals are present, recommend `paradigm_shift` with high confidence.
+
 ### Step 3: Generate Recommendation
 
 Based on the analysis, recommend ONE of:
